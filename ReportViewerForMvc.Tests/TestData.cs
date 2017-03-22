@@ -21,6 +21,7 @@ namespace ReportViewerForMvc.Tests
         public static readonly string LocalReportPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Reports\Report1.rdlc";
         public const string ServerReportPath = "/AdventureWorks 2012/Sales_by_Region";
         public const string ReportServerUrl = "http://localhost/ReportServer/";
+        public static bool TestServerReport = false;
 
         public readonly ReportViewer ReportViewerTests;
         public readonly List<ReportParameter> ReportParameterList;
@@ -134,9 +135,12 @@ namespace ReportViewerForMvc.Tests
             ReportViewerTests.LocalReport.SetParameters(ReportParameterList);
 
             //ServerReport properties
-            ReportViewerTests.ServerReport.ReportPath = ServerReportPath;
-            ReportViewerTests.ServerReport.ReportServerUrl = new Uri(ReportServerUrl);
-            ReportViewerTests.ServerReport.SetParameters(GetParametersServer());
+            if (TestServerReport)
+            {
+                ReportViewerTests.ServerReport.ReportPath = ServerReportPath;
+                ReportViewerTests.ServerReport.ReportServerUrl = new Uri(ReportServerUrl);
+                ReportViewerTests.ServerReport.SetParameters(GetParametersServer());
+            }
 
             //Set anonymous DataSource
             AnonymousDataSourceList = new[]

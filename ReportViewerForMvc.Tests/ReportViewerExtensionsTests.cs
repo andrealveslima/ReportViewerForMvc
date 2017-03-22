@@ -32,10 +32,13 @@ namespace ReportViewerForMvc.Tests
         [TestMethod]
         public void SetProperties_WithServerReport()
         {
-            ServerReport serverReport = new ServerReport();
-            serverReport.SetProperties(testData.ReportViewerTests.ServerReport);
+            if (TestData.TestServerReport)
+            {
+                ServerReport serverReport = new ServerReport();
+                serverReport.SetProperties(testData.ReportViewerTests.ServerReport);
 
-            CompareServerReport(testData.ReportViewerTests.ServerReport, serverReport);
+                CompareServerReport(testData.ReportViewerTests.ServerReport, serverReport);
+            }
         }
 
         [TestMethod]
@@ -89,7 +92,10 @@ namespace ReportViewerForMvc.Tests
             Assert.AreEqual(expected.Height, current.Height);
 
             CompareLocalReport(expected.LocalReport, current.LocalReport);
-            CompareServerReport(expected.ServerReport, current.ServerReport);
+            if (TestData.TestServerReport)
+            {
+                CompareServerReport(expected.ServerReport, current.ServerReport);
+            }
         }
 
         private void CompareLocalReport(LocalReport expected, LocalReport current)

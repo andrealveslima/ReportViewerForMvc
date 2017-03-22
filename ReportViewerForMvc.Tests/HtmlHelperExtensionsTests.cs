@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using HtmlAgilityPack;
 using Microsoft.Reporting.WebForms;
+using System.IO;
 
 namespace ReportViewerForMvc.Tests
 {
@@ -12,6 +13,14 @@ namespace ReportViewerForMvc.Tests
     {
         private HtmlHelper htmlHelper = new HtmlHelper(new ViewContext(), new TestViewDataContainer());
         private TestData testData = new TestData();
+
+        public HtmlHelperExtensionsTests()
+        {
+            HttpContext.Current = new HttpContext(
+                new HttpRequest("", "http://tempuri.org", ""),
+                new HttpResponse(new StringWriter())
+                );
+        }
 
         #region ControlTests
 
@@ -79,23 +88,26 @@ namespace ReportViewerForMvc.Tests
         [TestMethod]
         public void ReportViewer_WithAnonymousServerReport()
         {
-            HtmlString htmlString;
+            if (TestData.TestServerReport)
+            {
+                HtmlString htmlString;
 
-            htmlString = htmlHelper.ReportViewer(
-                TestData.AnonymousServerReportViewer,
-                TestData.AnonymousServerReport,
-                TestData.AnonymousServerParameters,
-                null);
+                htmlString = htmlHelper.ReportViewer(
+                    TestData.AnonymousServerReportViewer,
+                    TestData.AnonymousServerReport,
+                    TestData.AnonymousServerParameters,
+                    null);
 
-            TestWellformedHtmlDefaultAttributes(htmlString);
+                TestWellformedHtmlDefaultAttributes(htmlString);
 
-            htmlString = htmlHelper.ReportViewer(
-                TestData.AnonymousServerReportViewer,
-                TestData.AnonymousServerReport,
-                TestData.AnonymousServerParameters,
-                TestData.HtmlAttributes);
+                htmlString = htmlHelper.ReportViewer(
+                    TestData.AnonymousServerReportViewer,
+                    TestData.AnonymousServerReport,
+                    TestData.AnonymousServerParameters,
+                    TestData.HtmlAttributes);
 
-            TestWellformedHtmlCustomAttributes(htmlString);
+                TestWellformedHtmlCustomAttributes(htmlString);
+            }
         }
 
         [TestMethod]
@@ -137,7 +149,14 @@ namespace ReportViewerForMvc.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void ReportViewer_WithMalformedAnonymousParameters_ServerReport()
         {
-            htmlHelper.ReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.IncorrectData, null);
+            if (TestData.TestServerReport)
+            {
+                htmlHelper.ReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.IncorrectData, null);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         [TestMethod]

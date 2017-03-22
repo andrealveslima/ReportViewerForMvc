@@ -48,18 +48,21 @@ namespace ReportViewerForMvc.Tests
         [TestMethod]
         public void AnonymousReportViewer_WithServerReport()
         {
-            ReportViewer reportViewer;
+            if (TestData.TestServerReport)
+            {
+                ReportViewer reportViewer;
 
-            reportViewer = ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport);
+                reportViewer = ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport);
 
-            TestObjects(TestData.AnonymousServerReportViewer, reportViewer);
-            TestObjects(TestData.AnonymousServerReport, reportViewer.ServerReport);
+                TestObjects(TestData.AnonymousServerReportViewer, reportViewer);
+                TestObjects(TestData.AnonymousServerReport, reportViewer.ServerReport);
 
-            reportViewer = ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.AnonymousServerParameters);
+                reportViewer = ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.AnonymousServerParameters);
 
-            TestObjects(TestData.AnonymousServerReportViewer, reportViewer);
-            TestObjects(TestData.AnonymousServerReport, reportViewer.ServerReport);
-            TestParameters(TestData.AnonymousServerParameters, reportViewer.ServerReport.GetParameters());
+                TestObjects(TestData.AnonymousServerReportViewer, reportViewer);
+                TestObjects(TestData.AnonymousServerReport, reportViewer.ServerReport);
+                TestParameters(TestData.AnonymousServerParameters, reportViewer.ServerReport.GetParameters());
+            }
         }
 
         [TestMethod]
@@ -108,7 +111,14 @@ namespace ReportViewerForMvc.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void AnonymousReportViewer_WithMalformedParameters_ServerReport()
         {
-            ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.IncorrectData);
+            if (TestData.TestServerReport)
+            {
+                ReportViewerForMvc.AnonymousReportViewer(TestData.AnonymousServerReportViewer, TestData.AnonymousServerReport, TestData.IncorrectData);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         [TestMethod]
