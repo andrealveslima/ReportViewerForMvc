@@ -22,6 +22,8 @@ namespace ReportViewerForMvc
 
                 ReportViewer1.SetProperties(ReportViewerForMvc.ReportViewer);
             }
+
+            CopyPropertiesHelper.CopyEvents<ReportViewer>(ref ReportViewer1, ReportViewerForMvc.ReportViewer);
         }
     }
 }

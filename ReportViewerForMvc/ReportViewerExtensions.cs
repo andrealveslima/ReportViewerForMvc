@@ -22,6 +22,7 @@ namespace ReportViewerForMvc
             }
 
             CopyPropertiesHelper.Copy<ReportViewer>(ref reportViewer, properties);
+            CopyPropertiesHelper.CopyEvents<ReportViewer>(ref reportViewer, properties);
 
             reportViewer.LocalReport.SetProperties(properties.LocalReport);
             reportViewer.ServerReport.SetProperties(properties.ServerReport);
@@ -48,6 +49,8 @@ namespace ReportViewerForMvc
                 localReport.SetParameters(properties.GetParameters());
             }
             catch (MissingReportSourceException) { } //Do nothing
+
+            CopyPropertiesHelper.CopyEvents<LocalReport>(ref localReport, properties);
         }
 
         /// <summary>

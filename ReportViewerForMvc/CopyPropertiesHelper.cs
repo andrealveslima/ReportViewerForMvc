@@ -43,5 +43,59 @@ namespace ReportViewerForMvc
                 catch (TargetInvocationException) { } //Do nothing, just like my boss.
             }
         }
+
+        internal static void CopyEvents<T>(ref T obj, T source)
+        {
+            var theType = obj.GetType();
+            var events = theType.GetEvents();
+            foreach (var oneEvent in events)
+            {
+                var fieldInfo = theType.GetField(oneEvent.Name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (fieldInfo == null && obj is System.Web.UI.Control)
+                {
+                    var webControlFieldInfo = theType.GetField("Event" + oneEvent.Name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
+                    if (webControlFieldInfo != null)
+                    {
+                        var castedObj = obj as System.Web.UI.Control;
+                        var castedSource = source as System.Web.UI.Control;
+                        CopyWebControlEvents(castedObj, castedSource, oneEvent.Name);
+                    }
+                }
+                if (fieldInfo != null)
+                {
+                    var sourceDelegate = fieldInfo.GetValue(source) as Delegate;
+                    if (sourceDelegate != null)
+                    {
+                        foreach (var invocation in sourceDelegate.GetInvocationList())
+                        {
+                            var addHandler = oneEvent.GetAddMethod();
+                            object[] addHandlerArgs = { invocation };
+                            addHandler.Invoke(obj, addHandlerArgs);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void CopyWebControlEvents(System.Web.UI.Control obj, System.Web.UI.Control source, string eventName)
+        {
+            var theType = typeof(System.Web.UI.Control);
+            var propertyInfo = theType.GetProperty("Events", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var eventHandlerList = propertyInfo.GetValue(source, new object[] { }) as System.ComponentModel.EventHandlerList;
+            var fieldInfo = theType.GetField("Event" + eventName, BindingFlags.NonPublic | BindingFlags.Static);
+            var oneEvent = theType.GetEvent(eventName);
+
+            object eventKey = fieldInfo.GetValue(source);
+            var eventHandler = eventHandlerList[eventKey] as Delegate;
+            if (eventHandler != null)
+            {
+                foreach (var invocation in eventHandler.GetInvocationList())
+                {
+                    var addHandler = oneEvent.GetAddMethod();
+                    object[] addHandlerArgs = { invocation };
+                    addHandler.Invoke(obj, addHandlerArgs);
+                }
+            }
+        }
     }
 }
